@@ -1,0 +1,55 @@
+{% extends "form_layout.html" %}
+
+{% from "_form_helpers.html" import input_field, select_field, radio_field, checkbox_field, label_only %}
+
+{% block head %}
+    {{ super() }}
+    {% include "anytime_head.html"%}
+{% endblock head %}
+
+{% block fieldset %}
+<fieldset>
+    <p>{{ input_field(rec.id,"id",type="hidden",default=0)}}</p>
+    <p>{{ input_field(rec.title,"title",req=True, default="")}}</p>
+    <div class="w3-row">
+        {% set start_date = rec.start | local_date_and_time_string %}
+        <p class="w3-col w3-third w3-padding">{{ input_field(start_date,'start',label="Event Starts",id="start", req=True)}}</p>
+        {% set end_date = rec.end | local_date_and_time_string %}
+        <p class="w3-col w3-third w3-padding">{{ input_field(end_date,'end',label="Event Ends",id="end",req=True)}}</p>
+    </div>
+    <p>{{ select_field("location_id","Location", class="w3-border" ) }}
+            <option value="0">Select a location</option>
+            {% if locations %}
+            {% for loc in locations %}
+                <option value="{{loc.id}}" {% if loc.id == rec.location_id %}selected="selected" {% endif %}>{{loc.location_name}}</option>
+            {% endfor %}
+            {% endif %}
+        </select>
+    </p>
+    <div class="w3-row">
+        <p class="w3-col w3-third w3-padding">{{ input_field(rec.max_reservations,'max_reservations',label="Max. Reservations for Event")}}</p>
+        <p class="w3-col w3-twothird w3-padding">{{ input_field(rec.reservations_per_appointment,'reservations_per_appointment',label="Max. Reservations per Appt. (0 = period limit)",default="0")}}</p>
+    </div>
+    <div class="w3-row">
+        {% set open = rec.reservation_open | local_date_and_time_string %}
+        <p class="w3-col w3-third w3-padding">{{ input_field(open,'reservation_open',label="Reservation Signup Starts",id="open")}}</p>
+        {% set close = rec.reservation_close | local_date_and_time_string %}
+        <p class="w3-col w3-third w3-padding">{{ input_field(close,'reservation_close',label="Reservation Signup Closees",id="close")}}</p>
+    </div>
+</fieldset>
+
+<script>
+    var date_time_format = "%c/%e/%y %l:%i%p"; // "3/4/19 06:00AM"
+    var date_format = "%c/%e/%y"; // "3/4/19"
+    
+    function set_date_pickers(pickers,format){
+        for( i = 0;i<pickers.length;i++){
+            $(pickers[i]).AnyTime_noPicker().AnyTime_picker({ format: format } );                
+        }
+    }
+    
+    set_date_pickers(["#start","#end","#open","#close"],date_time_format);
+    
+</script>
+    
+{% endblock fieldset %}
